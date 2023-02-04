@@ -3,18 +3,31 @@ import BlogList from "./BlogList";
 
 const Home = () => {
   const [blogs, setBlogs] = useState(null);
+  const [isLoading, setisLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetch(" http://localhost:8000/blogs")
       .then((res) => {
+        if (!res.ok) {
+          throw Error("could not fetch the data for that resource");
+        }
         return res.json();
       })
       .then((data) => {
         setBlogs(data);
+        setisLoading(false);
+        setError(null);
+      })
+      .catch((err) => {
+        setisLoading(false);
+        setError(err.message);
       });
   }, []);
   return (
     <div className="home">
+      {Error && <h2> {error}</h2>}
+      {isLoading && <div> Loading... </div>}
       {blogs && <BlogList blogs={blogs} title="All Blogs" />}
       {/* <BlogList
         blogs={blogs.filter((blog) => blog.author === "king")}
